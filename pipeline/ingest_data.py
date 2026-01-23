@@ -7,8 +7,8 @@ from sqlalchemy import create_engine
 from tqdm.auto import tqdm
 
 
-year = 2021
-month = 1
+year = 2025
+month = 11
 
 dtype = {
     "VendorID": "Int64",
@@ -29,52 +29,43 @@ dtype = {
     "congestion_surcharge": "float64"
 }
 
+zonedtype = dtype = {
+    "VendorID": "Int64",
+    "Borough": "string",
+    "Zone": "string",
+    "service_zone": "string"
+}
 parse_dates = [
     "tpep_pickup_datetime",
     "tpep_dropoff_datetime"
 ]
 prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/'
 url = prefix + f'yellow_tripdata_{year}-{month:02d}.csv.gz'
-
+url = 'https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2025-11.parquet'
 
 pg_user = 'root'
 pg_pass='root'
 pg_host = 'localhost'
 pg_port = 5432
 pg_db = 'ny_taxi'
-target_table = 'yellow_taxi_data'
+target_table = 'taxi_trips_2025_11'
 def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table):
 
     engine = create_engine(f'postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
 
-    df_iter = pd.read_csv(
-        url,
-        dtype=dtype,
-        parse_dates=parse_dates,
-        iterator=True,
-        chunksize=100000,
+    df = pd.read_parquet(url)          # or url/http/s3 path
+
+# Optional: select only needed columns to save memory
+# df = pd.read_parquet("your_file.parquet", columns=["col1", "col2", "col3"])
+
+    df.to_sql(
+        name=target_table,
+        con=engine,
+        if_exists="replace",           # or "append" if table already exists
+        method="multi",                # faster for larger inserts
+        index=False
     )
-
-
-    first = True
-    for df_chunk in tqdm(df_iter):
-        if first:
-        
-            df_chunk.head(0).to_sql(
-            name=target_table,
-            con=engine,
-            if_exists="replace"
-            )
-            first = False
-            print("Table created")
-        # Insert chunk
-        df_chunk.to_sql(
-            name=target_table,
-            con=engine,
-            if_exists="append"
-        )
-
-        print("Inserted:", len(df_chunk))
+    print("loaded data")
 
 if __name__ == '__main__':
     run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table)
