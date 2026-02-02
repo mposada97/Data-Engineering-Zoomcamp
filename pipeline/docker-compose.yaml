@@ -92,4 +92,6 @@ services:
     depends_on:
       kestra_postgres:
         condition: service_started
+    env_file:                         
+      - .env_encoded
     
