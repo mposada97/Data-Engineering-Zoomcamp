@@ -1,0 +1,1 @@
+select * from {{ source('raw_date', 'yellow_tripdata') }}
