@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw_date
+    description: "The raw data from the source"
+    database: graphite-earth-486200-t1
+    schema: zoomcamp
+    tables: 
+      - name: green_tripdata
+      - name: yellow_tripdata
