@@ -1,7 +1,7 @@
 -- Updated stg_yellow_tripdata.sql to match green schema
 with tripdata as (
   select *
-  from {{ source('staging','yellow_tripdata') }}
+  from {{ source('raw_data','yellow_tripdata') }}
   where vendorid is not null 
 ),
 
