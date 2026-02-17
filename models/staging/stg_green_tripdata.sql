@@ -1,6 +1,6 @@
 with tripdata as (
   select *
-  from {{ source('staging','green_tripdata') }}
+  from {{ source('raw_data','green_tripdata') }}
   where vendorid is not null 
 ),
 

@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: raw_date
+  - name: raw_data
     description: "The raw data from the source"
     database: graphite-earth-486200-t1
     schema: zoomcamp
