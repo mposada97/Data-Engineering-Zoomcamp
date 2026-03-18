@@ -30,7 +30,7 @@ def create_events_source_kafka(t_env):
 
 
 def create_events_aggregated_sink(t_env):
-    table_name = 'green_aggregated'
+    table_name = 'green_session'
     sink_ddl = f"""
         CREATE TABLE {table_name} (
             window_start TIMESTAMP,
@@ -69,7 +69,7 @@ def log_aggregation():
             PULocationID,
             COUNT(*) AS num_trips
         FROM TABLE(
-            TUMBLE(TABLE {source_table}, DESCRIPTOR(event_timestamp), INTERVAL '5' MINUTE)
+            SESSION(TABLE {source_table} PARTITION BY PULocationID, DESCRIPTOR(event_timestamp), INTERVAL '5' MINUTE)
         )
         GROUP BY window_start, PULocationID;
 

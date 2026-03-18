@@ -6,8 +6,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Ride:
-    lpep_pickup_datetime: int  # epoch milliseconds
-    lpep_dropoff_datetime: int  # epoch milliseconds
+    lpep_pickup_datetime: str  
+    lpep_dropoff_datetime: str  
     PULocationID: int
     DOLocationID: int
     passenger_count: int
@@ -18,8 +18,8 @@ class Ride:
 
 def ride_from_row(row):
     return Ride(
-        lpep_pickup_datetime=int(row['lpep_pickup_datetime'].timestamp() * 1000),
-        lpep_dropoff_datetime=int(row['lpep_dropoff_datetime'].timestamp() * 1000),
+        lpep_pickup_datetime=str(row['lpep_pickup_datetime']),
+        lpep_dropoff_datetime=str(row['lpep_dropoff_datetime']),
         PULocationID=int(row['PULocationID']),
         DOLocationID=int(row['DOLocationID']),
         passenger_count=int(row['passenger_count']),
@@ -27,6 +27,7 @@ def ride_from_row(row):
         tip_amount=float(row['tip_amount']),
         total_amount=float(row['total_amount']),
     )
+
 
 
 def ride_serializer(ride):

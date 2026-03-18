@@ -30,13 +30,12 @@ def create_events_source_kafka(t_env):
 
 
 def create_events_aggregated_sink(t_env):
-    table_name = 'green_aggregated'
+    table_name = 'green_tip'
     sink_ddl = f"""
         CREATE TABLE {table_name} (
             window_start TIMESTAMP,
-            PULocationID INT,
-            num_trips BIGINT,
-            PRIMARY KEY (window_start, PULocationID) NOT ENFORCED
+            tip_amount DOUBLE,
+            PRIMARY KEY (window_start) NOT ENFORCED
         ) WITH (
             'connector' = 'jdbc',
             'url' = 'jdbc:postgresql://postgres:5432/postgres',
@@ -66,12 +65,11 @@ def log_aggregation():
         INSERT INTO {aggregated_table}
         SELECT
             window_start,
-            PULocationID,
-            COUNT(*) AS num_trips
+            SUM(tip_amount) AS tip_amount
         FROM TABLE(
-            TUMBLE(TABLE {source_table}, DESCRIPTOR(event_timestamp), INTERVAL '5' MINUTE)
+            TUMBLE(TABLE {source_table}, DESCRIPTOR(event_timestamp), INTERVAL '1' HOUR)
         )
-        GROUP BY window_start, PULocationID;
+        GROUP BY window_start;
 
         """).wait()
 
